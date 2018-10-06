@@ -111,7 +111,7 @@ def cameraCaptureOnly():
         container = av.open(drone.get_video_stream())
         frame_skip = 300
         currentFrames = 0
-        maxFrames = 200
+        maxFrames = 100
 
         url_flume = 'http://localhost:5140'
         headers={'Content-Type': 'application/octet-stream'}
@@ -132,10 +132,10 @@ def cameraCaptureOnly():
                 cv2.imshow('Video Feed', image)
                 
                 cv2.waitKey(1)
-                currentFrames = currentFrames + 1
+                
 
                 # Pass image to flume source 
-                if ((time.time() - fr_time) > 0.5):
+                if ((time.time() - fr_time) > 0.25):
                     msg = 'Found an image at time '+str(time.time()) 
                     success, encoded_image = cv2.imencode('.png', image)
                     
@@ -144,6 +144,7 @@ def cameraCaptureOnly():
                     response = requests.post(url = url_flume, data=encoded_image.tobytes(), headers=headers) 
                       
                     print(response.status_code, response.reason)
+                    currentFrames = currentFrames + 1
                     fr_time = time.time()
 
                 frame_skip = int((time.time() - start_time)/frame.time_base)
